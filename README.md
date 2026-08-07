@@ -5,23 +5,23 @@
 
 ---
 
-## 📖 Table of Contents
-1. [Overview & Value Proposition](#-overview--value-proposition)
-2. [Key Technical Innovations](#-key-technical-innovations)
-3. [System Architecture & Diagrams](#-system-architecture--diagrams)
-4. [Hand-Coded Regional Indian Logistics Rules](#-hand-coded-regional-indian-logistics-rules)
-5. [Admin Portal Breakdown (25 Section Views Across 6 Categories)](#-admin-portal-breakdown)
-6. [Worker Mobile Portal & Offline Resilience](#-worker-mobile-portal--offline-resilience)
-7. [Empirical Benchmark Results](#-empirical-benchmark-results)
-8. [Metered Cost Governance & Economics](#-metered-cost-governance--economics)
-9. [Role-Based Access Control (RBAC) & Security](#-role-based-access-control-rbac--security)
-10. [Step-by-Step Installation & Setup Guide](#-step-by-step-installation--setup-guide)
-11. [Running Backend Automated Unit Tests](#-running-backend-automated-unit-tests)
-12. [Pitch Landing Page](#-pitch-landing-page)
+## Table of Contents
+1. [Overview & Value Proposition](#overview--value-proposition)
+2. [Key Technical Innovations](#key-technical-innovations)
+3. [System Architecture & Diagrams](#system-architecture--diagrams)
+4. [Hand-Coded Regional Indian Logistics Rules](#hand-coded-regional-indian-logistics-rules)
+5. [Admin Portal Breakdown](#admin-portal-breakdown)
+6. [Worker Mobile Portal & Offline Resilience](#worker-mobile-portal--offline-resilience)
+7. [Empirical Benchmark Results](#empirical-benchmark-results)
+8. [Metered Cost Governance & Economics](#metered-cost-governance--economics)
+9. [Role-Based Access Control (RBAC) & Security](#role-based-access-control-rbac--security)
+10. [Step-by-Step Installation & Setup Guide](#step-by-step-installation--setup-guide)
+11. [Running Backend Automated Unit Tests](#running-backend-automated-unit-tests)
+12. [Pitch Landing Page](#pitch-landing-page)
 
 ---
 
-## 🚀 Overview & Value Proposition
+## Overview & Value Proposition
 
 In last-mile delivery, **the plan is only good until the first thing changes**. A customer refusing a delivery, a sudden traffic jam, or an emergency pickup can derail an entire day's schedule. Routine logistics solvers either take minutes to re-solve from scratch or lack transparency for human supervisors.
 
@@ -33,7 +33,7 @@ In last-mile delivery, **the plan is only good until the first thing changes**. 
 
 ---
 
-## ⚡ Key Technical Innovations
+## Key Technical Innovations
 
 1. **Decoupled AI Design**: Routine route solving costs **$0.00** via OR-Tools. LLMs are reserved strictly for human explanations (~$0.00015 per decision) and rare unresolvable exception conflicts.
 2. **Sub-30-Second Re-Planning**: Fast local search insertion/removal heuristics patch active routes in-place without triggering a full re-solve.
@@ -43,7 +43,7 @@ In last-mile delivery, **the plan is only good until the first thing changes**. 
 
 ---
 
-## 🏗️ System Architecture & Diagrams
+## System Architecture & Diagrams
 
 ### 1. High-Level Data & Execution Flow
 ```mermaid
@@ -62,13 +62,13 @@ flowchart TD
 
 ### 2. Decoupled AI Architecture (Hackathon Innovation Flow)
 ```
-Operational Event ──► Rule Engine ──► OR-Tools VRP ──► Route Candidate ──► AI Explanation ──► Self Check ──► Supervisor Approval
+Operational Event ---> Rule Engine ---> OR-Tools VRP ---> Route Candidate ---> AI Explanation ---> Self Check ---> Supervisor Approval
                                       ($0.00 Cost)                           (~$0.00015)
 ```
 
 ---
 
-## 🇮🇳 Hand-Coded Regional Indian Logistics Rules
+## Hand-Coded Regional Indian Logistics Rules
 
 RouteMind's **Constraint Engine** (`constraint_engine.py`) enforces 4 hard regional logistics constraints before any route is dispatched:
 
@@ -83,48 +83,48 @@ RouteMind's **Constraint Engine** (`constraint_engine.py`) enforces 4 hard regio
 
 ---
 
-## 🛠️ Admin Portal Breakdown
+## Admin Portal Breakdown
 
 The **Admin Control Center** features a responsive navigation sidebar organized into **6 core operational categories & 25 specialized section views**:
 
 ### 1. OPERATIONS
-- 📊 **Overview**: 10-second command view with 8 top KPI cards, Live Operations Summary, Route Performance, Exceptions, Approval Queue, and Mini Map.
-- ⚡ **Live Operations**: Real-time command center with filter controls (`ALL`, `ACTIVE`, `DELAYED`, `REPLANNING`, `COMPLETED`, `FAILED`, `OFFLINE`), live Leaflet map, route inspector panel, and event feed.
-- 🗺️ **Map**: Geographic control center with 10 layer toggles (Routes, Stops, Workers, Vehicles, Depots, Hubs, Failed Deliveries, New Pickups, Delayed Stops, Constraint Violations).
+- **Overview**: 10-second command view with 8 top KPI cards, Live Operations Summary, Route Performance, Exceptions, Approval Queue, and Mini Map.
+- **Live Operations**: Real-time command center with filter controls (`ALL`, `ACTIVE`, `DELAYED`, `REPLANNING`, `COMPLETED`, `FAILED`, `OFFLINE`), live Leaflet map, route inspector panel, and event feed.
+- **Map**: Geographic control center with 10 layer toggles (Routes, Stops, Workers, Vehicles, Depots, Hubs, Failed Deliveries, New Pickups, Delayed Stops, Constraint Violations).
 
 ### 2. ROUTES
-- ▶️ **Route Planning**: 5-step wizard (Step 1: Select Depot -> Step 2: Select Stops -> Step 3: Select Vehicle -> Step 4: Assign Worker -> Step 5: Enforce Constraints -> RUN OPTIMIZER) & side-by-side baseline vs RouteMind comparison.
-- 🔄 **Re-Planning**: Mid-day disruption simulator (`FAILED DELIVERY`, `NEW PRIORITY PICKUP`), process flow visualization, and diff proposal cards.
-- ✨ **Approvals**: Supervisor approval gate displaying BEFORE vs AFTER state, AI explanation ("Why did the route change?"), constraint validation ticks, and APPROVE/REJECT buttons.
-- 📜 **Route History**: Audit history and version control logs (Version 1 vs Version 2 vs Version 3).
+- **Route Planning**: 5-step wizard (Step 1: Select Depot -> Step 2: Select Stops -> Step 3: Select Vehicle -> Step 4: Assign Worker -> Step 5: Enforce Constraints -> RUN OPTIMIZER) & side-by-side baseline vs RouteMind comparison.
+- **Re-Planning**: Mid-day disruption simulator (`FAILED DELIVERY`, `NEW PRIORITY PICKUP`), process flow visualization, and diff proposal cards.
+- **Approvals**: Supervisor approval gate displaying BEFORE vs AFTER state, AI explanation ("Why did the route change?"), constraint validation ticks, and APPROVE/REJECT buttons.
+- **Route History**: Audit history and version control logs (Version 1 vs Version 2 vs Version 3).
 
 ### 3. LOGISTICS
-- 📦 **Shipments**: Shipment-level data table (Shipment ID, Stop ID, Address, Weight, COD Amount, Status).
-- 📍 **Stops**: Delivery and pickup locations manager with real-time address geocoding.
-- 🚛 **Fleet**: Vehicle fleet roster and KPI status (Total, Available, In Transit, Maintenance).
-- 👥 **Workers**: Delivery partner driver profiles and assigned vehicles.
-- 🏭 **Depots**: Operational depot hub overview (Electronic City Main Hub).
+- **Shipments**: Shipment-level data table (Shipment ID, Stop ID, Address, Weight, COD Amount, Status).
+- **Stops**: Delivery and pickup locations manager with real-time address geocoding.
+- **Fleet**: Vehicle fleet roster and KPI status (Total, Available, In Transit, Maintenance).
+- **Workers**: Delivery partner driver profiles and assigned vehicles.
+- **Depots**: Operational depot hub overview (Electronic City Main Hub).
 
 ### 4. INTELLIGENCE
-- ⚙️ **Optimization**: OR-Tools CVRPTW solver parameter tuning and primary objectives.
-- ⚡ **AI Operations**: Decoupled hybrid AI architecture visualization flow and LLM agent status.
-- 🏆 **Benchmarks**: 3-way solver comparison matrix and empirical distance comparison bar chart (Greedy vs OR-Tools vs RouteMind).
-- ⚠️ **Exceptions**: Central operational problem inbox categorized by severity (LOW, MEDIUM, HIGH, CRITICAL).
+- **Optimization**: OR-Tools CVRPTW solver parameter tuning and primary objectives.
+- **AI Operations**: Decoupled hybrid AI architecture visualization flow and LLM agent status.
+- **Benchmarks**: 3-way solver comparison matrix and empirical distance comparison bar chart (Greedy vs OR-Tools vs RouteMind).
+- **Exceptions**: Central operational problem inbox categorized by severity (LOW, MEDIUM, HIGH, CRITICAL).
 
 ### 5. ANALYTICS
-- 📈 **Performance**: Delivery success rate, on-time delivery rate, average duration, and average distance.
-- 💵 **Cost**: Economics & cost breakdown ($0.00 route solving vs ~$0.00015 LLM replan explanations).
+- **Performance**: Delivery success rate, on-time delivery rate, average duration, and average distance.
+- **Cost**: Economics & cost breakdown ($0.00 route solving vs ~$0.00015 LLM replan explanations).
 
 ### 6. SYSTEM
-- 🗄️ **Data**: Amazon Last Mile Routing Research Challenge (ALMRRC 2021) dataset slice pipeline status.
-- 🔗 **Integrations**: Service health cards for OpenStreetMap, Google Maps, OR-Tools, and Claude 3 AI Agent.
-- 🔔 **Notifications**: Real-time admin notification center.
-- 📄 **Audit Logs**: Timestamps, User, Action, Entity, and Description audit trail.
-- ⚙️ **Settings**: 8-section configurator (Profile, Security, Route Settings, Constraint Settings, AI Settings, Notification Settings, Map Settings, System Status).
+- **Data**: Amazon Last Mile Routing Research Challenge (ALMRRC 2021) dataset slice pipeline status.
+- **Integrations**: Service health cards for OpenStreetMap, Google Maps, OR-Tools, and Claude 3 AI Agent.
+- **Notifications**: Real-time admin notification center.
+- **Audit Logs**: Timestamps, User, Action, Entity, and Description audit trail.
+- **Settings**: 8-section configurator (Profile, Security, Route Settings, Constraint Settings, AI Settings, Notification Settings, Map Settings, System Status).
 
 ---
 
-## 📱 Worker Mobile Portal & Offline Resilience
+## Worker Mobile Portal & Offline Resilience
 
 The **Worker Mobile Portal** (`PartnerMobileView.jsx`) provides delivery partners with a mobile interface:
 - **Live Updating Map View**: Auto-updates whenever the Admin approves a mid-day re-plan or when stops are marked completed/failed.
@@ -133,7 +133,7 @@ The **Worker Mobile Portal** (`PartnerMobileView.jsx`) provides delivery partner
 
 ---
 
-## 📊 Empirical Benchmark Results
+## Empirical Benchmark Results
 
 Evaluated on the Amazon Last Mile Routing Research Challenge (ALMRRC 2021) dataset slice enriched with regional logistics attributes:
 
@@ -149,7 +149,7 @@ Evaluated on the Amazon Last Mile Routing Research Challenge (ALMRRC 2021) datas
 
 ---
 
-## 💵 Metered Cost Governance & Economics
+## Metered Cost Governance & Economics
 
 RouteMind logs every API call and computes token usage in real dollars (`cost_tracker.py`):
 
@@ -162,7 +162,7 @@ RouteMind logs every API call and computes token usage in real dollars (`cost_tr
 
 ---
 
-## 🔒 Role-Based Access Control (RBAC) & Security
+## Role-Based Access Control (RBAC) & Security
 
 RouteMind enforces role-based access control:
 - **Hub Supervisor (`admin@routemind.ai`)**: Authorized to access the Admin Control Portal, optimize routes, edit locations, configure rules, and approve/reject mid-day re-plans.
@@ -170,7 +170,7 @@ RouteMind enforces role-based access control:
 
 ---
 
-## 💻 Step-by-Step Installation & Setup Guide
+## Step-by-Step Installation & Setup Guide
 
 ### Prerequisites
 - **Node.js** (v18+ recommended)
@@ -217,7 +217,7 @@ npm run dev
 
 ---
 
-## 🧪 Running Backend Automated Unit Tests
+## Running Backend Automated Unit Tests
 
 To run the native unit test suite verifying solvers, constraint engines, re-plan heuristics, and cost trackers:
 
@@ -228,14 +228,14 @@ python backend/tests/run_tests.py
 
 ---
 
-## 🎨 Pitch Landing Page
+## Pitch Landing Page
 
 - **URL**: Open `http://localhost:5173/landing.html` (or `landing.html` in root) in your browser.
 - **Design**: Built strictly to the **"Organic Intelligence"** design system specification (`#fcfbf9` cream, `#171717` charcoal, `#4338ca` indigo, Playfair Display serif, JetBrains Mono, 30s background mesh drift, results strip, system grid, and capabilities accordion).
 
 ---
 
-## 📄 License & Attribution
+## License & Attribution
 
 - **Dataset Origin**: Amazon Last Mile Routing Research Challenge 2021 (ALMRRC 2021).
 - **License**: MIT License. Developed for the Supply Chain Adaptive Route Optimization Hackathon 2026.
