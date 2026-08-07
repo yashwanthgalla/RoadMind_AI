@@ -212,21 +212,25 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* Header Navbar */}
+      {/* Organic Intelligence Premium Header Navbar */}
       <header
         style={{
-          background: "var(--bg-cream)",
+          background: "rgba(252, 251, 249, 0.95)",
+          backdropFilter: "blur(12px)",
           borderBottom: "1px solid var(--border-color)",
-          padding: "1rem 2.5rem",
+          height: "76px",
+          padding: "0 2.5rem",
           position: "sticky",
           top: 0,
           zIndex: 1000,
           display: "flex",
-          justifySpace: "between",
-          alignItems: "center"
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.02)"
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        {/* Left Section: Logo & System Online Status */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
           <a
             href="/landing.html"
             style={{
@@ -235,19 +239,35 @@ export default function App() {
               fontFamily: "var(--font-display)",
               fontStyle: "italic",
               fontWeight: 700,
-              color: "#171717"
+              color: "#171717",
+              letterSpacing: "-0.02em"
             }}
           >
             RouteMind <span style={{ fontStyle: "normal", color: "var(--accent-indigo)", fontSize: "1.1rem" }}>AI</span>
           </a>
           
-          <span className="badge-mono badge-indigo" style={{ fontSize: "0.68rem" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.4rem 0.85rem",
+              borderRadius: "9999px",
+              background: "rgba(16, 185, 129, 0.08)",
+              border: "1px solid rgba(16, 185, 129, 0.25)",
+              color: "#059669",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.7rem",
+              letterSpacing: "0.25em",
+              fontWeight: 600
+            }}
+          >
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
             SYSTEM ONLINE
-          </span>
+          </div>
         </div>
 
-        {/* Center: Strict Role-Based Access Control Switcher */}
+        {/* Center Section: Dual Portal Switcher Pill */}
         <div
           style={{
             background: "#f4f3ef",
@@ -255,7 +275,8 @@ export default function App() {
             borderRadius: "9999px",
             border: "1px solid var(--border-color)",
             display: "flex",
-            gap: "0.3rem"
+            gap: "0.3rem",
+            boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)"
           }}
         >
           {isAdmin ? (
@@ -265,7 +286,7 @@ export default function App() {
                 background: activePortal === "admin" ? "var(--accent-indigo)" : "transparent",
                 color: activePortal === "admin" ? "#ffffff" : "var(--text-muted)",
                 border: "none",
-                padding: "0.45rem 1.1rem",
+                padding: "0.5rem 1.3rem",
                 borderRadius: "9999px",
                 fontFamily: "var(--font-mono)",
                 fontSize: "0.72rem",
@@ -275,7 +296,7 @@ export default function App() {
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.4rem",
+                gap: "0.45rem",
                 transition: "all 0.3s var(--ease-premium)"
               }}
             >
@@ -288,7 +309,7 @@ export default function App() {
                 background: "transparent",
                 color: "#9ca3af",
                 border: "none",
-                padding: "0.45rem 1.1rem",
+                padding: "0.5rem 1.3rem",
                 borderRadius: "9999px",
                 fontFamily: "var(--font-mono)",
                 fontSize: "0.72rem",
@@ -298,7 +319,7 @@ export default function App() {
                 cursor: "not-allowed",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.4rem",
+                gap: "0.45rem",
                 opacity: 0.6
               }}
               title="Admin Portal Restricted to Hub Supervisors"
@@ -313,6 +334,39 @@ export default function App() {
               background: activePortal === "worker" ? "#059669" : "transparent",
               color: activePortal === "worker" ? "#ffffff" : "var(--text-muted)",
               border: "none",
+              padding: "0.5rem 1.3rem",
+              borderRadius: "9999px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.72rem",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              transition: "all 0.3s var(--ease-premium)"
+            }}
+          >
+            <Smartphone size={14} /> Worker Portal
+          </button>
+        </div>
+
+        {/* Right Section: User Profile Badge & Logout */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontWeight: 600, color: "#171717", fontSize: "0.85rem" }}>{currentUser.name}</div>
+            <div style={{ color: isAdmin ? "var(--accent-indigo)" : "#059669", fontSize: "0.68rem", fontFamily: "var(--font-mono)", fontWeight: 600, letterSpacing: "0.15em" }}>
+              {isAdmin ? "ROLE: HUB SUPERVISOR" : "ROLE: DELIVERY PARTNER"}
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "transparent",
+              color: "#e11d48",
+              border: "1px solid rgba(225, 29, 72, 0.3)",
               padding: "0.45rem 1.1rem",
               borderRadius: "9999px",
               fontFamily: "var(--font-mono)",
@@ -326,24 +380,14 @@ export default function App() {
               gap: "0.4rem",
               transition: "all 0.3s var(--ease-premium)"
             }}
-          >
-            <Smartphone size={14} /> Worker Portal
-          </button>
-        </div>
-
-        {/* Right: User Profile & Logout */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div style={{ textAlign: "right", fontSize: "0.78rem" }}>
-            <div style={{ fontWeight: 600, color: "#171717" }}>{currentUser.name}</div>
-            <div style={{ color: isAdmin ? "var(--accent-indigo)" : "#059669", fontSize: "0.7rem", fontFamily: "var(--font-mono)", fontWeight: 600 }}>
-              {isAdmin ? "ROLE: HUB SUPERVISOR" : "ROLE: DELIVERY PARTNER"}
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="btn-outline"
-            style={{ fontSize: "0.72rem", padding: "0.4rem 0.85rem", color: "#e11d48", borderColor: "rgba(225, 29, 72, 0.3)" }}
-            title="Log Out"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#e11d48";
+              e.currentTarget.style.color = "#ffffff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "#e11d48";
+            }}
           >
             <LogOut size={14} /> Logout
           </button>
@@ -361,7 +405,7 @@ export default function App() {
             fontSize: "0.82rem",
             fontFamily: "var(--font-mono)",
             display: "flex",
-            justifySpace: "between",
+            justifyContent: "space-between",
             alignItems: "center"
           }}
         >
