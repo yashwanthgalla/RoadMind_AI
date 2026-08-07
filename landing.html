@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RouteMind — Adaptive Route Optimization</title>
+
+  <!-- Google Fonts: Playfair Display, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-cream: #fcfbf9;
+      --bg-dark: #171717;
+      --accent-indigo: #4338ca;
+      --accent-indigo-light: rgba(67, 56, 202, 0.15);
+      --accent-purple-light: rgba(147, 51, 234, 0.12);
+      --border-color: #e5e5e5;
+      
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --ease-custom: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-cream);
+      color: #171717;
+      font-family: var(--font-body);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    /* Fixed Header with mix-blend-mode: difference */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      padding: 0 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      mix-blend-mode: difference;
+      color: #ffffff;
+    }
+
+    .header-logo {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    nav {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    nav a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #ffffff;
+      text-decoration: none;
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 1px;
+      background: #ffffff;
+      transition: width 0.3s var(--ease-custom);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      color: #ffffff;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* Drifting Indigo/Purple Mesh Background */
+    .hero-mesh-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .mesh-blob-1 {
+      position: absolute;
+      top: -15%;
+      left: 20%;
+      width: 650px;
+      height: 650px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(255,255,255,0) 70%);
+      filter: blur(60px);
+      animation: meshDrift 30s linear infinite;
+    }
+
+    .mesh-blob-2 {
+      position: absolute;
+      top: 10%;
+      right: 15%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(255,255,255,0) 70%);
+      filter: blur(60px);
+      animation: meshDrift 30s linear infinite reverse;
+    }
+
+    @keyframes meshDrift {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* Hero Section */
+    section.hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 120px 2rem 140px;
+      background-color: var(--bg-cream);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 1000px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--accent-indigo);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 11vw, 6.5rem);
+      line-height: 0.92;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent-indigo);
+    }
+
+    .hero-subhead {
+      font-size: 1.25rem;
+      line-height: 1.45;
+      color: #525252;
+      max-width: 720px;
+      margin: 0 auto 3rem;
+      font-weight: 400;
+    }
+
+    .btn-initialize {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.1rem 2.5rem;
+      border-radius: 9999px;
+      background: var(--accent-indigo);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s var(--ease-custom), box-shadow 0.3s var(--ease-custom);
+      animation: btnPulse 3s infinite var(--ease-custom);
+      border: none;
+      cursor: pointer;
+    }
+
+    @keyframes btnPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(67, 56, 202, 0.3); }
+      50% { transform: scale(1.02); box-shadow: 0 10px 30px 5px rgba(67, 56, 202, 0.4); }
+    }
+
+    .btn-initialize:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    /* Wave transition container */
+    .hero-wave-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: var(--bg-cream);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.02);
+      z-index: 5;
+    }
+
+    /* Results Strip */
+    section.results-strip {
+      background: #f4f3ef;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 3.5rem 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .results-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .result-item {
+      padding: 0 1rem;
+    }
+
+    .result-number {
+      font-family: var(--font-mono);
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 700;
+      color: var(--accent-indigo);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .result-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #6b7280;
+    }
+
+    /* System Grid */
+    section.system-grid-section {
+      padding: 120px 2rem;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+    }
+
+    .service-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      aspect-ratio: 4 / 3;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s var(--ease-custom), box-shadow 0.4s var(--ease-custom);
+      cursor: pointer;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.08);
+      filter: blur(40px);
+      transition: opacity 0.4s var(--ease-custom);
+    }
+
+    .service-card:hover {
+      transform: scale(1.02) translateY(-16px);
+      box-shadow: 0 20px 40px rgba(67, 56, 202, 0.1);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent-indigo);
+      background: rgba(67, 56, 202, 0.06);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: 1px solid rgba(67, 56, 202, 0.15);
+    }
+
+    .hover-pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: #171717;
+      color: #ffffff;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s var(--ease-custom);
+    }
+
+    .service-card:hover .hover-pill {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-bottom {
+      z-index: 2;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-desc {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #525252;
+    }
+
+    /* Core Capabilities Accordion */
+    section.capabilities-section {
+      padding: 120px 2rem;
+      background: #f6f5f1;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .capabilities-layout {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 4rem;
+    }
+
+    .sticky-left {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+    }
+
+    .capabilities-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent-indigo);
+      text-decoration: none;
+      margin-top: 1.5rem;
+      font-weight: 600;
+      transition: gap 0.3s var(--ease-custom);
+    }
+
+    .capabilities-link:hover {
+      gap: 0.8rem;
+    }
+
+    .accordion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .accordion-item {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.3s var(--ease-custom);
+    }
+
+    .accordion-header {
+      padding: 1.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .accordion-title {
+      font-family: var(--font-body);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #737373;
+      transition: color 0.3s var(--ease-custom);
+    }
+
+    .accordion-item:hover .accordion-title,
+    .accordion-item.active .accordion-title {
+      color: #171717;
+    }
+
+    .accordion-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      color: var(--accent-indigo);
+      background: rgba(67, 56, 202, 0.08);
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease-custom), padding 0.4s var(--ease-custom);
+      padding: 0 2rem;
+    }
+
+    .accordion-item.active .accordion-body {
+      max-height: 180px;
+      padding: 0 2rem 1.75rem;
+    }
+
+    .accordion-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #525252;
+    }
+
+    /* Footer */
+    footer.dark-footer {
+      background: var(--bg-dark);
+      color: #ffffff;
+      padding: 140px 3rem 60px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 5rem 5rem 0 0;
+    }
+
+    .footer-radial-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(67, 56, 202, 0.3) 0%, rgba(23,23,23,0) 70%);
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    .footer-quote {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      font-weight: 400;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto 6rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-grid {
+      max-width: 1200px;
+      margin: 0 auto 5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 3rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-col p, .footer-col a {
+      font-size: 0.95rem;
+      color: #e5e5e5;
+      text-decoration: none;
+      line-height: 1.6;
+    }
+
+    .footer-col a:hover {
+      color: #818cf8;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      color: #737373;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Scroll Reveal Animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1000ms var(--ease-custom), transform 1000ms var(--ease-custom);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .mesh-blob-1, .mesh-blob-2, .btn-initialize {
+        animation: none !important;
+      }
+      .reveal {
+        transition: opacity 300ms ease !important;
+        transform: none !important;
+      }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      header {
+        padding: 0 1.5rem;
+      }
+      nav {
+        display: none;
+      }
+      .grid-container, .results-grid, .capabilities-layout, .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .sticky-left {
+        position: static;
+      }
+      footer.dark-footer {
+        border-radius: 2.5rem 2.5rem 0 0;
+        padding: 100px 1.5rem 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Header -->
+  <header>
+    <a href="#" class="header-logo">RouteMind</a>
+    
+    <nav>
+      <a href="#results">RESULTS</a>
+      <a href="#system">SYSTEM</a>
+      <a href="#capabilities">CAPABILITIES</a>
+      <a href="/index.html">DEMO</a>
+    </nav>
+
+    <div class="status-pill">
+      <div class="pulse-dot"></div>
+      SYSTEM ONLINE
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-mesh-container">
+      <div class="mesh-blob-1"></div>
+      <div class="mesh-blob-2"></div>
+    </div>
+
+    <div class="hero-content reveal">
+      <div class="eyebrow">TRACK 03 · ROUTE OPTIMIZATION</div>
+      <h1 class="hero-title">Routes that <em>replan</em> themselves.</h1>
+      <p class="hero-subhead">
+        Beats a greedy baseline on real delivery data, re-plans a live route in under 30 seconds, and explains every change before a supervisor approves it.
+      </p>
+      <a href="#system" class="btn-initialize">Initialize</a>
+    </div>
+
+    <div class="hero-wave-bottom"></div>
+  </section>
+
+  <!-- Results Strip -->
+  <section id="results" class="results-strip">
+    <div class="results-grid reveal">
+      <div class="result-item">
+        <div class="result-number">31.2%</div>
+        <div class="result-label">Distance Reduction vs Greedy</div>
+      </div>
+      <div class="result-item">
+        <div class="result-number">&lt; 30S</div>
+        <div class="result-label">Re-plan Latency (100+ Stops)</div>
+      </div>
+      <div class="result-item">
+        <div class="result-number">$0.00015</div>
+        <div class="result-label">Cost Per Re-plan Decision</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Grid -->
+  <section id="system" class="system-grid-section">
+    <div class="section-header reveal">
+      <div class="eyebrow">COOPERATING SERVICES</div>
+      <h2 class="section-title">Architected for Speed & Intelligence</h2>
+    </div>
+
+    <div class="grid-container">
+      <!-- Card 1: Planner -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[OR-TOOLS · NO LLM]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Planner</h3>
+          <p class="card-desc">Solves the day's stops as a vehicle-routing problem with time windows and vehicle capacity constraints.</p>
+        </div>
+      </div>
+
+      <!-- Card 2: Travel-Time Model -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[LEARNED ML]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Travel-Time Model</h3>
+          <p class="card-desc">Trained on planned-vs-actual GPS gaps from historical routes, correcting the distance matrix before Planner sees it.</p>
+        </div>
+      </div>
+
+      <!-- Card 3: Constraint Engine -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[RULES · NO LLM]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Constraint Engine</h3>
+          <p class="card-desc">Vetoes any route that breaks a zone-timing window, an odd-even restriction, or a partner's cash-carry limit.</p>
+        </div>
+      </div>
+
+      <!-- Card 4: Re-plan Service -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[HEURISTIC · &lt;30S]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Re-plan Service</h3>
+          <p class="card-desc">Patches a live route when a pickup lands or a delivery fails — no full re-solve required.</p>
+        </div>
+      </div>
+
+      <!-- Card 5: Explainer Agent -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[LLM · CHEAP MODEL]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Explainer Agent</h3>
+          <p class="card-desc">Turns a route diff into two sentences a supervisor can approve in five seconds.</p>
+        </div>
+      </div>
+
+      <!-- Card 6: Cost Tracker -->
+      <div class="service-card reveal">
+        <div class="card-top">
+          <span class="card-tag">[OBSERVABILITY]</span>
+          <span class="hover-pill">View</span>
+        </div>
+        <div class="card-bottom">
+          <h3 class="card-title">Cost Tracker</h3>
+          <p class="card-desc">Prices every decision in real dollars — routine route solving costs exactly $0.00.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities Accordion -->
+  <section id="capabilities" class="capabilities-section">
+    <div class="capabilities-layout">
+      <div class="sticky-left reveal">
+        <div class="eyebrow">SYSTEM HIGHLIGHTS</div>
+        <h2 class="section-title">Core Capabilities</h2>
+        <a href="#results" class="capabilities-link">See the benchmarks →</a>
+      </div>
+
+      <div class="accordion-list reveal">
+        <!-- Item 1 -->
+        <div class="accordion-item active">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span class="accordion-title">Real-Time Re-Planning</span>
+            <span class="accordion-tag">[&lt;30 SECONDS]</span>
+          </div>
+          <div class="accordion-body">
+            <p class="accordion-text">
+              A new pickup or a failed delivery doesn't wait for tomorrow's plan — Re-plan Service patches the route in place and Self-Check re-validates every constraint before anything ships.
+            </p>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span class="accordion-title">Explainable Approvals</span>
+            <span class="accordion-tag">[SUPERVISOR GATE]</span>
+          </div>
+          <div class="accordion-body">
+            <p class="accordion-text">
+              No route change reaches a partner until a human reads why and approves it. Partners are never silently re-sequenced mid-route.
+            </p>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span class="accordion-title">India-Specific Constraints</span>
+            <span class="accordion-tag">[ZONE · ODD-EVEN · COD]</span>
+          </div>
+          <div class="accordion-body">
+            <p class="accordion-text">
+              Zone timing, odd-even plate restrictions, and per-partner cash-carry limits are hard constraints, encoded once and enforced on every route.
+            </p>
+          </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span class="accordion-title">Cost-Governed Intelligence</span>
+            <span class="accordion-tag">[$ / DECISION]</span>
+          </div>
+          <div class="accordion-body">
+            <p class="accordion-text">
+              Routine planning never touches a language model. Explanation and rare exceptions do — and every call is metered.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dark Footer -->
+  <footer class="dark-footer">
+    <div class="footer-radial-glow"></div>
+
+    <blockquote class="footer-quote reveal">
+      "The plan is only good until the first thing changes."
+    </blockquote>
+
+    <div class="footer-grid reveal">
+      <div class="footer-col">
+        <h4>DEPOT / DATASET ORIGIN</h4>
+        <p>Bengaluru Logistics Belt<br>Simulated via Amazon LMRRC 2021 Dataset</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>HACKATHON SUBMISSION</h4>
+        <p>Track 03: Adaptive Route Optimization<br>Supply Chain Challenge 2026</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>NAVIGATION LINKS</h4>
+        <p><a href="/index.html">Open Live Working App Dashboard →</a></p>
+        <p><a href="#results">Empirical Benchmarks</a></p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 ROUTEMIND · ALL RIGHTS RESERVED</div>
+      <div>ADAPTIVE ROUTE OPTIMIZATION</div>
+    </div>
+  </footer>
+
+  <!-- Scripts: IntersectionObserver & Accordion Logic -->
+  <script>
+    // IntersectionObserver for Scroll Reveal
+    document.addEventListener("DOMContentLoaded", () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    });
+
+    // Accordion Toggle
+    function toggleAccordion(header) {
+      const item = header.parentElement;
+      const isActive = item.classList.contains("active");
+
+      document.querySelectorAll(".accordion-item").forEach((el) => el.classList.remove("active"));
+
+      if (!isActive) {
+        item.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
